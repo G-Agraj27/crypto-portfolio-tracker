@@ -8,7 +8,63 @@ datasource db {
 
 model User {
   id        String   @id @default(cuid())
-  email     String   @unique
   name      String?
+  email     String   @unique
   createdAt DateTime @default(now())
+
+  portfolios  Portfolio[]
+  watchlists  Watchlist[]
+  priceAlerts PriceAlert[]
+}
+
+model Portfolio {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  assets Asset[]
+}
+
+model Asset {
+  id              String @id @default(cuid())
+  coinId          String
+  symbol          String
+  quantity        Float
+  averageBuyPrice Float
+
+  portfolioId String
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  transactions Transaction[]
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  type      String
+  quantity  Float
+  price     Float
+  createdAt DateTime @default(now())
+
+  assetId String
+  asset   Asset  @relation(fields: [assetId], references: [id], onDelete: Cascade)
+}
+
+model Watchlist {
+  id     String @id @default(cuid())
+  coinId String
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PriceAlert {
+  id          String @id @default(cuid())
+  coinId      String
+  targetPrice Float
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
